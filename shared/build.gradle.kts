@@ -1,9 +1,12 @@
+import java.util.Properties
+
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.compose)
     alias(libs.plugins.jetbrains.kotlin.serialization)
+    alias(libs.plugins.gmazzo.buildconfig)
 }
 
 kotlin {
@@ -42,6 +45,9 @@ kotlin {
             // image loader
             api("io.github.qdsfdhvh:image-loader:1.7.1")
 
+            // koin
+            api(libs.koin.core)
+            api(libs.koin.compose)
 
         }
         commonTest.dependencies {
@@ -50,6 +56,10 @@ kotlin {
 
         androidMain.dependencies {
             implementation("io.ktor:ktor-client-okhttp:2.3.7")
+
+            // koin
+            implementation(libs.koin.android)
+            implementation(libs.koin.compose)
         }
 
         iosMain.dependencies {
@@ -58,6 +68,7 @@ kotlin {
         }
 
     }
+
 }
 
 android {
@@ -69,4 +80,16 @@ android {
 }
 dependencies {
     implementation("androidx.core:core-ktx:+")
+}
+
+val properties = Properties()
+properties.load(project.rootProject.file("local.properties").inputStream())
+
+buildConfig {
+
+    useKotlinOutput { topLevelConstants = true }
+
+    buildConfigField("String", "API_KEY", "\"${properties.getProperty("api_key")}\"")
+//    buildConfigField("String", "BASE_URL", "https://api.themoviedb.org/")
+//    buildConfigField("String", "IMAGE_URL", "https://image.tmdb.org/t/p/w342")
 }
